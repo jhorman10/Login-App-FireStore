@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 export class RegistroComponent implements OnInit {
 
   usuario: UsuarioModel;
+  recordarme = false;
 
 
   constructor(private auth: AuthService,
@@ -21,6 +22,7 @@ export class RegistroComponent implements OnInit {
   ngOnInit() {
     this.usuario = new UsuarioModel();
   }
+
   onSubmit(form: NgForm) {
 
     if (form.invalid) { return; }
@@ -34,15 +36,23 @@ export class RegistroComponent implements OnInit {
 
     this.auth.nuevoUsuario( this.usuario )
       .subscribe( res => {
+
         Swal.close();
+        if (this.recordarme) {
+          localStorage.setItem('email', this.usuario.email);
+        }
+
         console.log(res);
         this.router.navigateByUrl('/home');
+
       }, (err) => {
+
         console.error(err.error.error.message);
         Swal.fire({
           type: 'info',
           title: 'Error al registrar',
           text: err.error.error.messages
+
         });
       });
   }

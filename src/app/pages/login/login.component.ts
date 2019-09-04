@@ -14,11 +14,17 @@ export class LoginComponent implements OnInit {
 
   usuario: UsuarioModel;
 
+  recordarme = false;
+
   constructor(private auth: AuthService,
               private router: Router) { }
 
   ngOnInit() {
     this.usuario = new UsuarioModel();
+    if (localStorage.getItem('email')) {
+      this.usuario.email = localStorage.getItem('email');
+      this.recordarme = true;
+    }
   }
 
   login(form: NgForm) {
@@ -34,15 +40,24 @@ export class LoginComponent implements OnInit {
 
     this.auth.login( this.usuario )
       .subscribe( res => {
+
         console.log( res );
         Swal.close();
+
+        if (this.recordarme) {
+          localStorage.setItem('email', this.usuario.email);
+        }
+
         this.router.navigateByUrl('/home');
+
       }, (err) => {
+
         console.error(err.error.error.message);
         Swal.fire({
           type: 'error',
           title: 'Error al autenticar',
           text: err.error.error.message
+
         });
       });
 
